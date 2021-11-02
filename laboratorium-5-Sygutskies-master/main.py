@@ -27,7 +27,33 @@ def film_in_category(category:Union[int,str])->pd.DataFrame:
     Returns:
     pd.DataFrame: DataFrame zawierający wyniki zapytania
     '''
-    return None
+    if type(category) == str:
+        result = pd.read_sql(f"SELECT film.title, language.name as languge, category.name as category\
+                          FROM film \
+                          INNER JOIN film_category \
+                          ON film.film_id = film_category.film_id \
+                          INNER JOIN category \
+                          ON film_category.category_id = category.category_id \
+                          INNER JOIN language \
+                          ON film.language_id = language.language_id \
+                          WHERE category.name IN ('{category}')\
+                          ORDER BY film.title, language.name", con=connection)
+    else:
+        if type(category) == int:
+            result = pd.read_sql(f"SELECT film.title, language.name as languge, category.name as category\
+                          FROM film \
+                          INNER JOIN film_category \
+                          ON film.film_id = film_category.film_id \
+                          INNER JOIN category \
+                          ON film_category.category_id = category.category_id \
+                          INNER JOIN language \
+                          ON film.language_id = language.language_id \
+                          WHERE category.category_id = {category}\
+                          ORDER BY film.title, language.name", con=connection)
+        else:
+            return None
+
+    return result
     
 def film_in_category_case_insensitive(category:Union[int,str])->pd.DataFrame:
     ''' Funkcja zwracająca wynik zapytania do bazy o tytuł filmu, język, oraz kategorię dla zadanego:
@@ -47,7 +73,33 @@ def film_in_category_case_insensitive(category:Union[int,str])->pd.DataFrame:
     Returns:
     pd.DataFrame: DataFrame zawierający wyniki zapytania
     '''
-    return None
+    if type(category) == str:
+        result = pd.read_sql(f"SELECT film.title, language.name as languge, category.name as category\
+                          FROM film \
+                          INNER JOIN film_category \
+                          ON film.film_id = film_category.film_id \
+                          INNER JOIN category \
+                          ON film_category.category_id = category.category_id \
+                          INNER JOIN language \
+                          ON film.language_id = language.language_id \
+                          WHERE category.name ILIKE '{category}'\
+                          ORDER BY film.title, language.name", con=connection)
+    else:
+        if type(category) == int:
+            result = pd.read_sql(f"SELECT film.title, language.name as languge, category.name as category\
+                          FROM film \
+                          INNER JOIN film_category \
+                          ON film.film_id = film_category.film_id \
+                          INNER JOIN category \
+                          ON film_category.category_id = category.category_id \
+                          INNER JOIN language \
+                          ON film.language_id = language.language_id \
+                          WHERE category.category_id = {category}\
+                          ORDER BY film.title, language.name", con=connection)
+        else:
+            return None
+
+    return result
     
 def film_cast(title:str)->pd.DataFrame:
     ''' Funkcja zwracająca wynik zapytania do bazy o obsadę filmu o dokładnie zadanym tytule.
@@ -64,7 +116,16 @@ def film_cast(title:str)->pd.DataFrame:
     Returns:
     pd.DataFrame: DataFrame zawierający wyniki zapytania
     '''
-    return None
+    if type(title) != str:
+        return None
+        result = pd.read_sql(f" SELECT category.name as category, AVG(film.length), SUM(film.length), MIN(film.length), MAX(film.length)\
+                            FROM film \
+                            INNER JOIN film_category \
+                            ON film.film_id = film_category.film_id \
+                            INNER JOIN category \
+                            ON film_category.category_id = category.category_id \
+                            WHERE category.name = {name} \
+                            GROUP BY category.name", con=connection)
     
 
 def film_title_case_insensitive(words:list) :
