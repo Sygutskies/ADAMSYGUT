@@ -118,23 +118,12 @@ def film_cast(title:str)->pd.DataFrame:
     '''
     if type(title) != str:
         return None
-    title = "'" + title + "'"
 
-    result = pd.read_sql(f"SELECT film.title, actor.first_name as first_name, actor.last_name as last_name\
-    FROM film\
-    INNER JOIN film_actor\
-    ON film.film_id = film_actor.film_id\
-    INNER JOIN actor\
-    ON film_actor.actor_id = actor.actor_id\
-    INNER JOIN inventory\
-    ON film.film_id = inventory.film_id\
-    INNER JOIN rental\
-    ON inventory.inventory_id = rental.inventory_id\
-    INNER JOIN customer\
-    ON rental.customer_id = customer.customer_id\
-    WHERE film.title = {title}\
-    ORDER BY customer.last_name DESC, customer.first_name DESC", con=connection)
-
+    result = pd.read_sql(f"SELECT actor.first_name, actor.last_name FROM film \
+                    LEFT JOIN film_actor ON film_actor.film_id = film.film_id \
+                    LEFT JOIN actor ON actor.actor_id = film_actor.actor_id \
+                    WHERE film.title ~* '{title}' \
+                    ORDER BY actor.last_name, actor.first_name ", con=connection)
     return result
 
 
@@ -154,21 +143,13 @@ def film_title_case_insensitive(words:list) :
     Returns:
     pd.DataFrame: DataFrame zawierający wyniki zapytania
     '''
-    if type(words) != str:
+    if type(words) != list:
         return None
-    words = "'" + words + "'"
 
-    result = pd.read_sql(f"SELECT film.title\
-        FROM film\
-        INNER JOIN inventory\
-        ON film.film_id = inventory.film_id\
-        INNER JOIN rental\
-        ON inventory.inventory_id = rental.inventory_id\
-        INNER JOIN customer\
-        ON rental.customer_id = customer.customer_id\
-        WHERE film.title ILIKE IN words\
-        ORDER BY customer.last_name, customer.first_name", con=connection)
-
+    words_joined = "|".join(words)
+    result = pd.read_sql(f"SELECT film.title FROM film \
+                    WHERE film.title ~* '[[:<:]]({words_joined})[[:>:]]' \
+                    ORDER BY film.title ", con=connection)
     return result
 
 def country_names_started_from_P():
@@ -213,10 +194,10 @@ def films_with_trip_or_alone():
 
     return result
 
-def xd():
+def zapytanie_1():
     result = pd.read_sql(f"select first_name from actor where first_name ~ '^ Al[a: z, 1: 9] *'", con=connection)
     return result
 
-def xd2():
+def zapytanie_2():
     result = pd.read_sql(f"select first_name from actor where first_name ~ * '^ al[a: z, 1: 9] *'", con=connection)
     return result
