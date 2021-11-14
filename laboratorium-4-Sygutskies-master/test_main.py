@@ -74,3 +74,6 @@ def test_category_statistic_length(name:Union[int,float], result):
     else:
         test =  main.category_statistic_length(name)
         pd.testing.assert_frame_equal(result,test), 'Spodziewany wynik: {0}, aktualny {1}. Błędy implementacji.'.format(result, main.category_statistic_length(name))
+
+if __name__ == "__main__":
+    pytest.main()

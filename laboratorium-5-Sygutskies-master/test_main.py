@@ -48,3 +48,5 @@ def test_film_title_case_insensitive(words:list, result):
     else:
         test =  main.film_title_case_insensitive(words)
         pd.testing.assert_frame_equal(result,test), 'Spodziewany wynik: {0}, aktualny {1}. Błędy implementacji.'.format(result, main.film_title_case_insensitive(words))
+if __name__ == "__main__":
+    pytest.main()
